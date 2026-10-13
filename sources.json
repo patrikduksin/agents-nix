@@ -1,0 +1,17 @@
+{
+  "version": "0.0.46-nightly.20261013.3080",
+  "platforms": {
+    "x86_64-linux": {
+      "name": "linux-x64",
+      "hash": "sha256-099oL/2voB7PGhJos4C13dKEIb75QEZ0puhu2F9FT4E="
+    },
+    "aarch64-linux": {
+      "name": "linux-arm64",
+      "hash": "sha256-Uf9W620+kFJ3k4jVQKBDnz5uGZsVP2XbEirKJ2pai9o="
+    },
+    "aarch64-darwin": {
+      "name": "darwin-arm64",
+      "hash": "sha256-34GwUutm7XaOcd92644IvZ4+QdlQZs9TVz+Vjo4U3p0="
+    }
+  }
+}

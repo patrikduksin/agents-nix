@@ -1,0 +1,41 @@
+name: Update T3 Code
+
+on:
+  schedule:
+    - cron: "17 * * * *" # nightlies ship several times a day
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency: update
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Pin the newest nightly
+        id: pin
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          ./update.sh
+          echo "version=$(jq -r .version sources.json)" >>"$GITHUB_OUTPUT"
+          git diff --quiet || echo "changed=true" >>"$GITHUB_OUTPUT"
+
+      - uses: cachix/install-nix-action@v31
+        if: steps.pin.outputs.changed
+
+      - name: Build
+        if: steps.pin.outputs.changed
+        run: nix build .#t3code && ./result/bin/t3 --version
+
+      - name: Commit
+        if: steps.pin.outputs.changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "t3code ${{ steps.pin.outputs.version }}"
+          git push
