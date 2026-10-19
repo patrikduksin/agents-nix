@@ -1,17 +1,17 @@
 {
-  "version": "0.1.1-nightly.20261018.3335",
+  "version": "0.1.1-nightly.20261019.3348",
   "platforms": {
     "x86_64-linux": {
       "name": "linux-x64",
-      "hash": "sha256-cWCwYX98oBi3e6ScJDXTFiDQpjot0SQ4CjF7xxQP2gI="
+      "hash": "sha256-q7pLdpvlOCMP/Z0ArREUi345YUqUeFkir6sK55sYkj4="
     },
     "aarch64-linux": {
       "name": "linux-arm64",
-      "hash": "sha256-78hPXOxLegyXxvS2kyWdtlt3NFlXtJC4uhsuYeeZex8="
+      "hash": "sha256-qO1KrVMlE2MOIiTPZa3B6rsS9I1QRJNZnsfILYw+sBo="
     },
     "aarch64-darwin": {
       "name": "darwin-arm64",
-      "hash": "sha256-gYjx73xBcIo8ZR23w/B79bq6Q4PjTgYSyqrIrBoEgc4="
+      "hash": "sha256-K0g5n6bnZ6GP/efT53lpOfOVxkKa30guIqXBLJF0/U8="
     }
   }
 }
