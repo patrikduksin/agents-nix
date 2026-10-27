@@ -26,6 +26,25 @@ stdenv.mkDerivation {
   # The binary carries its JS payload after the ELF sections; stripping drops it.
   dontStrip = true;
 
+  # autoPatchelf sets the interpreter and RUNPATH in one patchelf call, which
+  # (patchelf 0.19) leaves t3 with overlapping LOAD segments: ld.so segfaults
+  # before main. Patching RUNPATH first, then the interpreter, keeps it valid,
+  # so t3 is patched by hand and autoPatchelf only does the native modules.
+  dontAutoPatchelf = true;
+  postFixup = lib.optionalString stdenv.hostPlatform.isLinux ''
+    autoPatchelf $out/lib/t3code/node_modules $out/lib/t3code/resource-monitor
+    patchelf --set-rpath ${lib.makeLibraryPath [ stdenv.cc.cc.lib ]} $out/lib/t3code/t3
+    patchelf --set-interpreter "$(cat $NIX_CC/nix-support/dynamic-linker)" $out/lib/t3code/t3
+  '';
+
+  # Fail the build, not the machine running it, when the binary can't start.
+  doInstallCheck = true;
+  installCheckPhase = ''
+    runHook preInstallCheck
+    $out/bin/t3 --version
+    runHook postInstallCheck
+  '';
+
   installPhase = ''
     runHook preInstall
     mkdir -p $out/lib/t3code $out/bin

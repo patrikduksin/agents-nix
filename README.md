@@ -1,12 +1,21 @@
 # t3code-nix
 
-[T3 Code](https://github.com/pingdotgg/t3code) nightly as a Nix package, built
-from the official release archives.
+Nix packages, built from official release binaries and bumped every hour:
 
-A GitHub Action checks for a new nightly every hour, pins it in `sources.json`
-(hashes come from the release's `SHA256SUMS`), builds it, and commits. So a
-flake that uses this as an input picks up the latest nightly on
-`nix flake update`.
+| Package | Source | Channel |
+|---|---|---|
+| `t3code` | [pingdotgg/t3code](https://github.com/pingdotgg/t3code) release archives | nightly |
+| `claude-code` | Anthropic's native build (`claude-code-releases` bucket) | latest |
+| `codex` | [openai/codex](https://github.com/openai/codex) release binaries (static musl on Linux) | stable, no alphas |
+
+Nothing is compiled: each package downloads a binary and, on Linux, points it
+at the Nix glibc. nixpkgs ships these too, but days behind.
+
+A GitHub Action checks for new releases every hour, pins them in
+`pkgs/<name>/sources.json` (hashes come from the publishers' own checksums:
+T3's `SHA256SUMS`, Claude's `manifest.json`, GitHub's asset digests), builds
+each one, runs its `--version`, and commits. So a flake that uses this as an
+input picks up the newest of all three on `nix flake update`.
 
 ```nix
 inputs.t3code = {
@@ -14,10 +23,15 @@ inputs.t3code = {
   inputs.nixpkgs.follows = "nixpkgs";
 };
 
-# then: t3code.packages.${system}.default, or nixpkgs.overlays = [ t3code.overlays.default ];
+# then: nixpkgs.overlays = [ t3code.overlays.default ];  (replaces pkgs.t3code, pkgs.claude-code, pkgs.codex)
+# or:   t3code.packages.${system}.{t3code,claude-code,codex}
 ```
 
-Run `./update.sh` to bump the pin by hand.
+`claude-code` is unfree, so the consuming nixpkgs needs `allowUnfree` (or a
+predicate allowing it).
 
-Don't use `t3 update` or `t3 service install` with this package: they install a
-second copy under `~/.t3/runtime` and write their own systemd unit.
+Run `./update.sh` (or `./update.sh codex`) to bump pins by hand.
+
+Self-updaters are off: Claude Code runs with `DISABLE_AUTOUPDATER=1`. Don't use
+`t3 update` or `t3 service install` with this package: they install a second
+copy under `~/.t3/runtime` and write their own systemd unit.

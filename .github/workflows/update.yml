@@ -1,8 +1,8 @@
-name: Update T3 Code
+name: Update packages
 
 on:
   schedule:
-    - cron: "17 * * * *" # nightlies ship several times a day
+    - cron: "17 * * * *" # T3 nightlies, Claude Code and Codex all ship several times a day
   workflow_dispatch:
 
 permissions:
@@ -16,26 +16,27 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Pin the newest nightly
-        id: pin
+      - uses: cachix/install-nix-action@v31
+
+      # Each package is pinned, built and committed on its own, so one broken
+      # release doesn't hold back the others. The build runs each binary's
+      # --version (installCheckPhase), so a pin that can't start is dropped.
+      - name: Pin, build and commit each package
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
-          ./update.sh
-          echo "version=$(jq -r .version sources.json)" >>"$GITHUB_OUTPUT"
-          git diff --quiet || echo "changed=true" >>"$GITHUB_OUTPUT"
-
-      - uses: cachix/install-nix-action@v31
-        if: steps.pin.outputs.changed
-
-      - name: Build
-        if: steps.pin.outputs.changed
-        run: nix build .#t3code && ./result/bin/t3 --version
-
-      - name: Commit
-        if: steps.pin.outputs.changed
-        run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -am "t3code ${{ steps.pin.outputs.version }}"
+          failed=()
+          for pkg in t3code claude-code codex; do
+            ./update.sh "$pkg" || { failed+=("$pkg"); git checkout -- "pkgs/$pkg"; continue; }
+            git diff --quiet -- "pkgs/$pkg" && continue
+            if nix build -L --no-link ".#$pkg"; then
+              git commit -m "$pkg $(jq -r .version "pkgs/$pkg/sources.json")" -- "pkgs/$pkg"
+            else
+              failed+=("$pkg")
+              git checkout -- "pkgs/$pkg"
+            fi
+          done
           git push
+          [ ${#failed[@]} -eq 0 ] || { echo "::error::failed: ${failed[*]}"; exit 1; }
