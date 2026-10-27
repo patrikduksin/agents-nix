@@ -1,4 +1,4 @@
-# t3code-nix
+# agents-nix
 
 Nix packages, built from official release binaries and bumped every hour:
 
@@ -18,13 +18,13 @@ each one, runs its `--version`, and commits. So a flake that uses this as an
 input picks up the newest of all three on `nix flake update`.
 
 ```nix
-inputs.t3code = {
-  url = "github:patrikduksin/t3code-nix";
+inputs.agents-nix = {
+  url = "github:patrikduksin/agents-nix";
   inputs.nixpkgs.follows = "nixpkgs";
 };
 
-# then: nixpkgs.overlays = [ t3code.overlays.default ];  (replaces pkgs.t3code, pkgs.claude-code, pkgs.codex)
-# or:   t3code.packages.${system}.{t3code,claude-code,codex}
+# then: nixpkgs.overlays = [ agents-nix.overlays.default ];  (replaces pkgs.t3code, pkgs.claude-code, pkgs.codex)
+# or:   agents-nix.packages.${system}.{t3code,claude-code,codex}
 ```
 
 `claude-code` is unfree, so the consuming nixpkgs needs `allowUnfree` (or a
