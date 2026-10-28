@@ -51,7 +51,7 @@ update_codex() {
   version=$(jq -r '.tag_name | ltrimstr("rust-v")' <<<"$release")
   [ "$version" != "$(current codex)" ] || { echo "codex: already at $version"; return; }
   for p in x86_64-linux:x86_64-unknown-linux-musl aarch64-linux:aarch64-unknown-linux-musl aarch64-darwin:aarch64-apple-darwin; do
-    echo "${p%%:*} ${p#*:} $(jq -r --arg f "codex-${p#*:}.tar.gz" \
+    echo "${p%%:*} ${p#*:} $(jq -r --arg f "codex-package-${p#*:}.tar.gz" \
       '.assets[] | select(.name == $f) | .digest | ltrimstr("sha256:")' <<<"$release")"
   done | write codex "$version"
 }
