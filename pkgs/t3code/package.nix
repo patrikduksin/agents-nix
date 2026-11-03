@@ -49,6 +49,9 @@ stdenv.mkDerivation {
     runHook preInstall
     mkdir -p $out/lib/t3code $out/bin
     cp -r . $out/lib/t3code
+    # Native modules ship gnu and musl prebuilds side by side; node only loads
+    # the gnu one here, and the musl ones need a libc autoPatchelf can't find.
+    find $out/lib/t3code/node_modules -mindepth 1 -maxdepth 2 -type d -name '*-musl' -prune -exec rm -rf {} +
     ln -s $out/lib/t3code/t3 $out/bin/t3
     runHook postInstall
   '';
