@@ -3,6 +3,7 @@
   stdenv,
   fetchurl,
   autoPatchelfHook,
+  vulkan-loader,
 }:
 let
   sources = lib.importJSON ./sources.json;
@@ -20,8 +21,12 @@ stdenv.mkDerivation {
   };
 
   nativeBuildInputs = lib.optionals stdenv.hostPlatform.isLinux [ autoPatchelfHook ];
-  # libstdc++ and libatomic for the t3 binary and its native node modules.
-  buildInputs = lib.optionals stdenv.hostPlatform.isLinux [ stdenv.cc.cc.lib ];
+  # libstdc++ and libatomic for the t3 binary and its native node modules;
+  # libvulkan for the @transcribe-cpp Vulkan backend.
+  buildInputs = lib.optionals stdenv.hostPlatform.isLinux [
+    stdenv.cc.cc.lib
+    vulkan-loader
+  ];
 
   # The binary carries its JS payload after the ELF sections; stripping drops it.
   dontStrip = true;
@@ -51,7 +56,8 @@ stdenv.mkDerivation {
     cp -r . $out/lib/t3code
     # Native modules ship gnu and musl prebuilds side by side; node only loads
     # the gnu one here, and the musl ones need a libc autoPatchelf can't find.
-    find $out/lib/t3code/node_modules -mindepth 1 -maxdepth 2 -type d -name '*-musl' -prune -exec rm -rf {} +
+    # Packages name them `<pkg>-musl` or, like koffi, `musl_<arch>` inside.
+    find $out/lib/t3code/node_modules -mindepth 1 -type d \( -name '*-musl' -o -name 'musl_*' \) -prune -exec rm -rf {} +
     ln -s $out/lib/t3code/t3 $out/bin/t3
     runHook postInstall
   '';
