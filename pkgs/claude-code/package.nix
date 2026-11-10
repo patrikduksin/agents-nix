@@ -35,10 +35,13 @@ stdenv.mkDerivation {
     ${lib.optionalString stdenv.hostPlatform.isLinux ''
       patchelf --set-interpreter "$(cat $NIX_CC/nix-support/dynamic-linker)" $out/libexec/claude
     ''}
-    # Nix owns updates; bubblewrap and socat back Claude's sandbox on Linux.
+    # Nix owns updates of the binary, not of plugins: DISABLE_AUTOUPDATER also
+    # hides marketplace auto-update in /plugin, FORCE_AUTOUPDATE_PLUGINS brings
+    # it back. bubblewrap and socat back Claude's sandbox on Linux.
     makeWrapper $out/libexec/claude $out/bin/claude \
       --argv0 claude \
       --set DISABLE_AUTOUPDATER 1 \
+      --set FORCE_AUTOUPDATE_PLUGINS 1 \
       --set DISABLE_INSTALLATION_CHECKS 1 ${lib.optionalString stdenv.hostPlatform.isLinux "\\
       --prefix PATH : ${lib.makeBinPath [ bubblewrap socat ]}"}
     runHook postInstall
