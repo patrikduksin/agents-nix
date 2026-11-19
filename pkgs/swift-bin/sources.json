@@ -1,0 +1,7 @@
+{
+  "version": "6.4.2",
+  "platforms": {
+    "x86_64-linux": { "name": "ubuntu24.04", "hash": "sha256-Lp6+wECtRZ3Ymm0JOgLYMUk5E1EEhQ+uTVwPF0+zuow=" },
+    "aarch64-linux": { "name": "ubuntu24.04-aarch64", "hash": "sha256-MHdyr8wLlQH6pHl+tBlwdvrPV2hZOg2NK4NhXJWwBA4=" }
+  }
+}

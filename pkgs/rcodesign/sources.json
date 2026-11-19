@@ -1,0 +1,7 @@
+{
+  "version": "0.29.0",
+  "platforms": {
+    "x86_64-linux": { "name": "x86_64-unknown-linux-musl", "hash": "sha256-2+hc7djuQhe2TpoOTCrvkquLyqpB8gvemXgf8C5gAAI=" },
+    "aarch64-linux": { "name": "aarch64-unknown-linux-musl", "hash": "sha256-Svksh931L18tElijtOVsfcuPGyRo33RJdsXxOeAxlh8=" }
+  }
+}

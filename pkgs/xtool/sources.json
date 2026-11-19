@@ -1,0 +1,7 @@
+{
+  "version": "1.24.0",
+  "platforms": {
+    "x86_64-linux": { "name": "x86_64", "hash": "sha256-2/2dchbwd8hMFxtojEFzw3wjyna/f9GF0amuilPatZ8=" },
+    "aarch64-linux": { "name": "aarch64", "hash": "sha256-S8BRX+1x77huglZPNY76DExtdr8bz9TF8lZye1PsWcg=" }
+  }
+}
